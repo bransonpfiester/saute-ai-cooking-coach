@@ -1,0 +1,27 @@
+{
+  "name": "Sauté - AI Cooking Coach",
+  "short_name": "Sauté",
+  "description": "Master cooking fundamentals with AI-powered vision coaching",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#f97316",
+  "orientation": "portrait",
+  "icons": [
+    {
+      "src": "/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "maskable any"
+    },
+    {
+      "src": "/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable any"
+    }
+  ],
+  "categories": ["education", "lifestyle", "food"],
+  "lang": "en",
+  "dir": "ltr"
+}
