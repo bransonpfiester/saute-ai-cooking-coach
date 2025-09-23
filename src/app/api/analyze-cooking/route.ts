@@ -1,9 +1,10 @@
 import OpenAI from 'openai';
 import { NextRequest, NextResponse } from 'next/server';
 
-const openai = new OpenAI({
+// Initialize OpenAI only if API key is available
+const openai = process.env.OPENAI_API_KEY ? new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
-});
+}) : null;
 
 export async function POST(request: NextRequest) {
   try {
@@ -16,9 +17,9 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    if (!process.env.OPENAI_API_KEY) {
+    if (!process.env.OPENAI_API_KEY || !openai) {
       return NextResponse.json(
-        { error: 'OpenAI API key not configured' },
+        { error: 'OpenAI API key not configured. Please add OPENAI_API_KEY environment variable.' },
         { status: 500 }
       );
     }
