@@ -55,123 +55,174 @@ export default function KnifeBasics() {
   };
 
   const goToStep = (stepIndex: number) => {
-    // Only allow going to steps that are validated or the current step
     if (stepIndex <= currentStep || (stepIndex > 0 && stepValidations[stepIndex - 1])) {
       setCurrentStep(stepIndex);
     }
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-orange-50 to-red-50">
-      <div className="container mx-auto px-4 py-8">
+    <div className="min-h-screen bg-gradient-to-br from-orange-50 via-white to-red-50 p-4">
+      <div className="max-w-4xl mx-auto">
         {/* Header */}
-        <div className="text-center mb-8">
+        <div className="text-center mb-8 pt-4">
           <Link 
             href="/"
-            className="inline-block text-orange-600 hover:text-orange-700 mb-4 font-medium"
+            className="inline-flex items-center text-gray-600 hover:text-gray-800 mb-6 font-medium transition-colors"
           >
-            ← Back to Home
+            <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+            </svg>
+            Back to Skills
           </Link>
-          <h1 className="text-4xl font-bold text-gray-800 mb-2">Knife Basics</h1>
-          <p className="text-gray-600">Master the fundamentals of safe knife handling</p>
+          
+          <div className="inline-flex items-center justify-center w-20 h-20 bg-gradient-to-br from-orange-400 to-red-500 rounded-3xl mb-6 shadow-lg">
+            <span className="text-3xl">🔪</span>
+          </div>
+          
+          <h1 className="text-4xl font-bold bg-gradient-to-r from-gray-900 via-gray-700 to-gray-900 bg-clip-text text-transparent mb-2">
+            Knife Basics
+          </h1>
+          <p className="text-gray-600 text-lg">Master the fundamentals of safe knife handling</p>
         </div>
 
-        {/* Progress Bar */}
-        <div className="max-w-2xl mx-auto mb-8">
-          <div className="flex justify-between items-center mb-4">
-            <span className="text-sm text-gray-600">
-              Step {currentStep + 1} of {steps.length}
-            </span>
-            <div className="flex items-center gap-4">
-              <span className="text-sm text-gray-600">
-                {stepValidations.filter(Boolean).length} of {steps.length} validated
-              </span>
-              <span className="text-sm text-gray-600">
-                {Math.round(((currentStep + 1) / steps.length) * 100)}% Complete
-              </span>
+        {/* Progress Card */}
+        <div className="bg-white rounded-3xl p-6 shadow-lg border border-gray-100 mb-8">
+          <div className="flex items-center justify-between mb-6">
+            <div>
+              <p className="text-sm text-gray-500 font-medium">Progress</p>
+              <p className="text-2xl font-bold text-gray-900">
+                Step {currentStep + 1} of {steps.length}
+              </p>
+            </div>
+            <div className="text-right">
+              <p className="text-sm text-gray-500 font-medium">Validated</p>
+              <p className="text-2xl font-bold text-emerald-600">
+                {stepValidations.filter(Boolean).length}/{steps.length}
+              </p>
             </div>
           </div>
-          <div className="w-full bg-gray-200 rounded-full h-2 mb-2">
-            <div 
-              className="bg-orange-500 h-2 rounded-full transition-all duration-300"
-              style={{ width: `${((currentStep + 1) / steps.length) * 100}%` }}
-            />
+
+          {/* Progress Bars */}
+          <div className="space-y-3">
+            <div>
+              <div className="flex justify-between text-sm text-gray-500 mb-1">
+                <span>Lesson Progress</span>
+                <span>{Math.round(((currentStep + 1) / steps.length) * 100)}%</span>
+              </div>
+              <div className="w-full bg-gray-200 rounded-full h-2">
+                <div 
+                  className="bg-gradient-to-r from-orange-400 to-red-500 h-2 rounded-full transition-all duration-500"
+                  style={{ width: `${((currentStep + 1) / steps.length) * 100}%` }}
+                />
+              </div>
+            </div>
+            
+            <div>
+              <div className="flex justify-between text-sm text-gray-500 mb-1">
+                <span>Skill Mastery</span>
+                <span>{Math.round((stepValidations.filter(Boolean).length / steps.length) * 100)}%</span>
+              </div>
+              <div className="w-full bg-gray-200 rounded-full h-2">
+                <div 
+                  className="bg-gradient-to-r from-emerald-400 to-green-500 h-2 rounded-full transition-all duration-500"
+                  style={{ width: `${(stepValidations.filter(Boolean).length / steps.length) * 100}%` }}
+                />
+              </div>
+            </div>
           </div>
-          <div className="w-full bg-gray-200 rounded-full h-1">
-            <div 
-              className="bg-green-500 h-1 rounded-full transition-all duration-300"
-              style={{ width: `${(stepValidations.filter(Boolean).length / steps.length) * 100}%` }}
-            />
-          </div>
+
           {!stepValidations[currentStep] && (
-            <div className="mt-3 p-3 bg-orange-50 border border-orange-200 rounded-lg">
+            <div className="mt-6 p-4 bg-gradient-to-r from-amber-50 to-orange-50 rounded-2xl border border-amber-200">
               <div className="flex items-center">
-                <span className="text-orange-500 mr-2">🎯</span>
-                <p className="text-orange-800 text-sm font-medium">
-                  You must validate your technique with the AI coach below before proceeding to the next step.
-                </p>
+                <div className="w-10 h-10 bg-gradient-to-br from-amber-400 to-orange-500 rounded-2xl flex items-center justify-center mr-3">
+                  <span className="text-white text-lg">🎯</span>
+                </div>
+                <div>
+                  <p className="text-amber-800 font-medium">Validation Required</p>
+                  <p className="text-amber-700 text-sm">Demonstrate your technique with the AI coach to continue</p>
+                </div>
               </div>
             </div>
           )}
         </div>
 
         {/* Step Navigation */}
-        <div className="max-w-2xl mx-auto mb-8">
-          <div className="flex flex-wrap gap-2 justify-center">
+        <div className="bg-white rounded-3xl p-6 shadow-lg border border-gray-100 mb-8">
+          <p className="text-gray-500 text-sm font-medium mb-4">Steps</p>
+          <div className="flex flex-wrap gap-3">
             {steps.map((_, index) => (
               <button
                 key={index}
                 onClick={() => goToStep(index)}
                 disabled={index > currentStep && !stepValidations[index - 1]}
-                className={`w-8 h-8 rounded-full font-medium text-sm transition-colors ${
+                className={`relative w-12 h-12 rounded-2xl font-medium text-sm transition-all duration-300 ${
                   index === currentStep
-                    ? 'bg-orange-500 text-white'
+                    ? 'bg-gradient-to-br from-orange-400 to-red-500 text-white shadow-lg scale-110'
                     : stepValidations[index]
-                    ? 'bg-green-500 text-white'
+                    ? 'bg-gradient-to-br from-emerald-400 to-green-500 text-white shadow-md hover:scale-105'
                     : index < currentStep
-                    ? 'bg-green-500 text-white'
+                    ? 'bg-gradient-to-br from-emerald-400 to-green-500 text-white shadow-md hover:scale-105'
                     : index > currentStep && !stepValidations[index - 1]
                     ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
-                    : 'bg-gray-200 text-gray-600 hover:bg-gray-300'
+                    : 'bg-gray-200 text-gray-600 hover:bg-gray-300 hover:scale-105'
                 }`}
               >
-                {stepValidations[index] ? '✓' : index + 1}
+                {stepValidations[index] ? (
+                  <svg className="w-5 h-5 mx-auto" fill="currentColor" viewBox="0 0 20 20">
+                    <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                  </svg>
+                ) : (
+                  <span>{index + 1}</span>
+                )}
               </button>
             ))}
           </div>
         </div>
 
         {/* Current Step Content */}
-        <div className="max-w-2xl mx-auto">
-          <div className="bg-white rounded-lg shadow-lg p-8 mb-8">
-            <h2 className="text-2xl font-bold text-gray-800 mb-4">
-              {steps[currentStep].title}
-            </h2>
-            <p className="text-gray-700 text-lg leading-relaxed mb-6">
-              {steps[currentStep].content}
-            </p>
-            <div className="bg-orange-50 border-l-4 border-orange-500 p-4 rounded">
-              <div className="flex items-start">
-                <div className="text-orange-500 mr-2">💡</div>
-                <div>
-                  <p className="text-orange-800 font-medium">Pro Tip:</p>
-                  <p className="text-orange-700">{steps[currentStep].tip}</p>
-                </div>
-              </div>
+        <div className="bg-white rounded-3xl p-8 shadow-lg border border-gray-100 mb-8">
+          <div className="flex items-start mb-6">
+            <div className="w-12 h-12 bg-gradient-to-br from-orange-400 to-red-500 rounded-2xl flex items-center justify-center mr-4">
+              <span className="text-white font-bold">{currentStep + 1}</span>
+            </div>
+            <div>
+              <h2 className="text-2xl font-bold text-gray-900 mb-2">
+                {steps[currentStep].title}
+              </h2>
+              <p className="text-gray-600 text-lg leading-relaxed">
+                {steps[currentStep].content}
+              </p>
             </div>
           </div>
 
-          {/* Navigation Buttons */}
-          <div className="flex justify-between items-center mb-8">
+          <div className="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-2xl p-6 border border-blue-100">
+            <div className="flex items-start">
+              <div className="w-10 h-10 bg-gradient-to-br from-blue-400 to-indigo-500 rounded-2xl flex items-center justify-center mr-4">
+                <span className="text-white text-lg">💡</span>
+              </div>
+              <div>
+                <p className="text-blue-800 font-medium mb-1">Pro Tip</p>
+                <p className="text-blue-700">{steps[currentStep].tip}</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Navigation */}
+        <div className="bg-white rounded-3xl p-6 shadow-lg border border-gray-100 mb-8">
+          <div className="flex justify-between items-center">
             <button
               onClick={prevStep}
               disabled={currentStep === 0}
-              className={`px-6 py-3 rounded-lg font-medium transition-colors ${
+              className={`flex items-center px-6 py-3 rounded-2xl font-medium transition-all duration-300 ${
                 currentStep === 0
-                  ? 'bg-gray-200 text-gray-400 cursor-not-allowed'
-                  : 'bg-gray-500 text-white hover:bg-gray-600'
+                  ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
+                  : 'bg-gray-200 text-gray-700 hover:bg-gray-300 hover:scale-105'
               }`}
             >
+              <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+              </svg>
               Previous
             </button>
 
@@ -179,16 +230,17 @@ export default function KnifeBasics() {
               stepValidations[currentStep] ? (
                 <Link
                   href="/"
-                  className="bg-green-500 hover:bg-green-600 text-white font-semibold py-3 px-6 rounded-lg transition-colors"
+                  className="flex items-center px-8 py-3 bg-gradient-to-r from-emerald-400 to-green-500 text-white rounded-2xl font-medium shadow-lg hover:shadow-xl hover:scale-105 transition-all duration-300"
                 >
-                  Lesson Complete! 🎉
+                  <span className="mr-2">🎉</span>
+                  Complete Lesson
                 </Link>
               ) : (
                 <div className="text-center">
-                  <p className="text-gray-600 text-sm mb-2">Complete the AI validation below to finish</p>
+                  <p className="text-gray-500 text-sm mb-2">Complete validation to finish</p>
                   <button
                     disabled
-                    className="bg-gray-300 text-gray-500 font-semibold py-3 px-6 rounded-lg cursor-not-allowed"
+                    className="px-6 py-3 bg-gray-200 text-gray-500 rounded-2xl font-medium cursor-not-allowed"
                   >
                     Validate Final Step
                   </button>
@@ -198,26 +250,29 @@ export default function KnifeBasics() {
               <button
                 onClick={nextStep}
                 disabled={!stepValidations[currentStep]}
-                className={`font-semibold py-3 px-6 rounded-lg transition-colors ${
+                className={`flex items-center px-6 py-3 rounded-2xl font-medium transition-all duration-300 ${
                   stepValidations[currentStep]
-                    ? 'bg-orange-500 hover:bg-orange-600 text-white'
-                    : 'bg-gray-300 text-gray-500 cursor-not-allowed'
+                    ? 'bg-gradient-to-r from-orange-400 to-red-500 text-white shadow-lg hover:shadow-xl hover:scale-105'
+                    : 'bg-gray-200 text-gray-500 cursor-not-allowed'
                 }`}
               >
-                {stepValidations[currentStep] ? 'Next Step' : 'Validate Technique First'}
+                {stepValidations[currentStep] ? 'Next Step' : 'Validate First'}
+                <svg className="w-5 h-5 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                </svg>
               </button>
             )}
           </div>
-
-          {/* AI Vision Coach */}
-          <VisionCoach 
-            skill="knife-basics"
-            context={`Currently learning: ${steps[currentStep].title}. ${steps[currentStep].content}`}
-            stepTitle={steps[currentStep].title}
-            requireValidation={true}
-            onValidationSuccess={handleValidationSuccess}
-          />
         </div>
+
+        {/* AI Vision Coach */}
+        <VisionCoach 
+          skill="knife-basics"
+          context={`Currently learning: ${steps[currentStep].title}. ${steps[currentStep].content}`}
+          stepTitle={steps[currentStep].title}
+          requireValidation={true}
+          onValidationSuccess={handleValidationSuccess}
+        />
       </div>
     </div>
   );

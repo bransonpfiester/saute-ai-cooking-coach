@@ -199,10 +199,13 @@ export default function VisionCoach({ skill, context = '', stepTitle = '', onVal
   }
 
   return (
-    <div className="bg-white rounded-xl shadow-lg p-6 space-y-6">
+    <div className="bg-white rounded-3xl shadow-lg border border-gray-100 p-8 space-y-6">
       <div className="text-center">
-        <h2 className="text-2xl font-bold text-gray-800 mb-2">
-          {skillEmojis[skill]} AI {skillTitles[skill]}
+        <div className="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-br from-blue-400 to-purple-500 rounded-3xl mb-4 shadow-lg">
+          <span className="text-2xl">{skillEmojis[skill]}</span>
+        </div>
+        <h2 className="text-2xl font-bold bg-gradient-to-r from-gray-900 via-gray-700 to-gray-900 bg-clip-text text-transparent mb-2">
+          AI {skillTitles[skill]}
         </h2>
         <p className="text-gray-600">
           Get real-time feedback on your cooking technique
@@ -211,15 +214,18 @@ export default function VisionCoach({ skill, context = '', stepTitle = '', onVal
 
       {/* Camera Permission Check */}
       {hasPermission === null && (
-        <div className="text-center bg-blue-50 border border-blue-200 rounded-lg p-6">
-          <div className="text-4xl mb-4">📹</div>
-          <h3 className="text-lg font-semibold text-blue-800 mb-2">Ready to Start AI Coaching?</h3>
-          <p className="text-blue-600 mb-4">Click below to enable your camera and get personalized feedback on your technique</p>
+        <div className="text-center bg-gradient-to-r from-blue-50 to-indigo-50 border border-blue-200 rounded-3xl p-8">
+          <div className="w-16 h-16 bg-gradient-to-br from-blue-400 to-indigo-500 rounded-3xl flex items-center justify-center mx-auto mb-4">
+            <span className="text-white text-2xl">📹</span>
+          </div>
+          <h3 className="text-xl font-bold text-gray-900 mb-2">Ready to Start AI Coaching?</h3>
+          <p className="text-gray-600 mb-6">Enable your camera to get personalized feedback on your technique</p>
           <button
             onClick={startCamera}
-            className="bg-blue-500 hover:bg-blue-600 text-white font-semibold py-3 px-6 rounded-lg transition-colors shadow-md hover:shadow-lg"
+            className="inline-flex items-center px-8 py-3 bg-gradient-to-r from-blue-500 to-indigo-600 text-white font-semibold rounded-2xl shadow-lg hover:shadow-xl hover:scale-105 transition-all duration-300"
           >
-            🎥 Enable Camera & Start Coaching
+            <span className="mr-2">🎥</span>
+            Enable Camera & Start Coaching
           </button>
         </div>
       )}
@@ -239,23 +245,25 @@ export default function VisionCoach({ skill, context = '', stepTitle = '', onVal
 
       {/* Video Stream */}
       {hasPermission && (
-        <div className="space-y-4">
-          <div className="relative bg-gray-100 rounded-lg overflow-hidden">
+        <div className="space-y-6">
+          <div className="relative bg-gradient-to-br from-gray-100 to-gray-200 rounded-3xl overflow-hidden shadow-inner">
             <video
               ref={videoRef}
               autoPlay
               playsInline
               muted
-              className="w-full h-auto"
+              className="w-full h-auto rounded-3xl"
               style={{ maxHeight: '400px' }}
             />
             <canvas ref={canvasRef} className="hidden" />
             
             {!isStreamActive && (
-              <div className="absolute inset-0 flex items-center justify-center bg-gray-200">
+              <div className="absolute inset-0 flex items-center justify-center bg-gradient-to-br from-gray-100 to-gray-200 rounded-3xl">
                 <div className="text-center">
-                  <div className="text-4xl mb-2">📹</div>
-                  <p className="text-gray-600">Camera not active</p>
+                  <div className="w-16 h-16 bg-gradient-to-br from-gray-300 to-gray-400 rounded-3xl flex items-center justify-center mx-auto mb-4">
+                    <span className="text-white text-2xl">📹</span>
+                  </div>
+                  <p className="text-gray-600 font-medium">Camera not active</p>
                 </div>
               </div>
             )}
