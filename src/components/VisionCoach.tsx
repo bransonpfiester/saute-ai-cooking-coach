@@ -53,14 +53,18 @@ export default function VisionCoach({ skill, context = '', stepTitle = '', onVal
         setIsStreamActive(true);
         setHasPermission(true);
       }
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error('Camera access error:', error);
       setHasPermission(false);
       
-      if (error.name === 'NotAllowedError') {
-        setError('Camera access denied. Please allow camera permissions and refresh the page.');
-      } else if (error.name === 'NotFoundError') {
-        setError('No camera found. Please connect a camera and try again.');
+      if (error && typeof error === 'object' && 'name' in error) {
+        if (error.name === 'NotAllowedError') {
+          setError('Camera access denied. Please allow camera permissions and refresh the page.');
+        } else if (error.name === 'NotFoundError') {
+          setError('No camera found. Please connect a camera and try again.');
+        } else {
+          setError('Failed to access camera. Please check your camera settings.');
+        }
       } else {
         setError('Failed to access camera. Please check your camera settings.');
       }
@@ -136,9 +140,12 @@ export default function VisionCoach({ skill, context = '', stepTitle = '', onVal
         }, 2000); // Give user time to read the approval message
       }
 
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error('Analysis error:', error);
-      setError(error.message || 'Failed to analyze image. Please try again.');
+      const errorMessage = error && typeof error === 'object' && 'message' in error 
+        ? String(error.message) 
+        : 'Failed to analyze image. Please try again.';
+      setError(errorMessage);
     } finally {
       setIsAnalyzing(false);
     }
@@ -267,9 +274,9 @@ export default function VisionCoach({ skill, context = '', stepTitle = '', onVal
               <>
                 <button
                   onClick={captureAndAnalyze}
-                  disabled={isAnalyzing || (requireValidation && isApproved)}
+                  disabled={isAnalyzing || (requireValidation && isApproved === true)}
                   className={`font-semibold py-2 px-6 rounded-lg transition-colors flex items-center gap-2 ${
-                    requireValidation && isApproved
+                    requireValidation && isApproved === true
                       ? 'bg-green-500 text-white cursor-default'
                       : requireValidation
                       ? 'bg-orange-500 hover:bg-orange-600 disabled:bg-gray-400 text-white'
@@ -281,7 +288,7 @@ export default function VisionCoach({ skill, context = '', stepTitle = '', onVal
                       <div className="animate-spin w-4 h-4 border-2 border-white border-t-transparent rounded-full"></div>
                       Analyzing Technique...
                     </>
-                  ) : requireValidation && isApproved ? (
+                  ) : requireValidation && isApproved === true ? (
                     <>
                       <span>✅</span>
                       Technique Approved!
@@ -328,7 +335,7 @@ export default function VisionCoach({ skill, context = '', stepTitle = '', onVal
       {feedback && (
         <div className={`rounded-lg p-6 ${
           requireValidation 
-            ? isApproved 
+            ? isApproved === true
               ? 'bg-gradient-to-r from-green-50 to-emerald-50 border border-green-200' 
               : 'bg-gradient-to-r from-yellow-50 to-orange-50 border border-yellow-200'
             : 'bg-gradient-to-r from-blue-50 to-indigo-50 border border-blue-200'
@@ -336,7 +343,7 @@ export default function VisionCoach({ skill, context = '', stepTitle = '', onVal
           <div className="flex items-start">
             <div className="text-2xl mr-4">
               {requireValidation 
-                ? isApproved 
+                ? isApproved === true
                   ? '✅' 
                   : '🔄' 
                 : '🤖'}
@@ -345,20 +352,20 @@ export default function VisionCoach({ skill, context = '', stepTitle = '', onVal
               <div className="flex items-center justify-between mb-2">
                 <h3 className={`font-semibold ${
                   requireValidation 
-                    ? isApproved 
+                    ? isApproved === true
                       ? 'text-green-800' 
                       : 'text-yellow-800'
                     : 'text-blue-800'
                 }`}>
                   {requireValidation 
-                    ? isApproved 
+                    ? isApproved === true
                       ? '✨ Technique Approved!' 
                       : `Try Again (Attempt ${attempts})`
                     : 'AI Coach Feedback:'}
                 </h3>
                 {requireValidation && confidence > 0 && (
                   <span className={`text-xs px-2 py-1 rounded-full ${
-                    isApproved 
+                    isApproved === true
                       ? 'bg-green-100 text-green-700' 
                       : 'bg-yellow-100 text-yellow-700'
                   }`}>
@@ -368,21 +375,21 @@ export default function VisionCoach({ skill, context = '', stepTitle = '', onVal
               </div>
               <p className={`leading-relaxed whitespace-pre-wrap ${
                 requireValidation 
-                  ? isApproved 
+                  ? isApproved === true
                     ? 'text-green-700' 
                     : 'text-yellow-700'
                   : 'text-blue-700'
               }`}>
                 {feedback}
               </p>
-              {requireValidation && isApproved && (
+              {requireValidation && isApproved === true && (
                 <div className="mt-3 p-3 bg-green-100 rounded-lg">
                   <p className="text-green-800 text-sm font-medium">
                     🎉 Great job! You can now proceed to the next step.
                   </p>
                 </div>
               )}
-              {requireValidation && !isApproved && attempts > 0 && (
+              {requireValidation && isApproved !== true && attempts > 0 && (
                 <div className="mt-3 p-3 bg-yellow-100 rounded-lg">
                   <p className="text-yellow-800 text-sm font-medium">
                     💪 Keep practicing! Try adjusting your technique and capture again.

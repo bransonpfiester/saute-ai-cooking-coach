@@ -131,12 +131,12 @@ export default function Home() {
         {/* Coming Soon Section */}
         <div className="text-center bg-white rounded-xl shadow-lg p-8 max-w-2xl mx-auto">
           <h2 className="text-2xl font-bold text-gray-800 mb-4">
-            🚀 Coming Soon: AI Vision Coaching
+            🚀 AI Vision Coaching Available Now!
           </h2>
           <p className="text-gray-600 leading-relaxed">
-            We're working on integrating AI vision technology that can watch your cooking technique 
-            and provide real-time feedback. Soon you'll be able to get personalized coaching as you 
-            practice these fundamental skills!
+            Experience cutting-edge AI vision technology that watches your cooking technique 
+            and provides real-time feedback. Get personalized coaching as you 
+            practice these fundamental skills with step-by-step validation!
           </p>
         </div>
       </div>

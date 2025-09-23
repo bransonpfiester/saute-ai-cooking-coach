@@ -177,10 +177,10 @@ Be encouraging but honest. This is attempt ${attempts || 1}.`;
       confidence: requireValidation ? confidence : undefined
     });
 
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error('OpenAI API error:', error);
     
-    if (error.code === 'insufficient_quota') {
+    if (error && typeof error === 'object' && 'code' in error && error.code === 'insufficient_quota') {
       return NextResponse.json(
         { error: 'OpenAI API quota exceeded. Please check your billing.' },
         { status: 429 }
