@@ -33,10 +33,10 @@ const steps = [
 ];
 
 export default function MiseEnPlace() {
-  const [currentStep, setCurrentStep] = useState(0);
+  const [currentStep, setCurrentStep] = useState(0);  const [stepValidations, setStepValidations] = useState<boolean[]>(new Array(steps.length).fill(false));
 
   const nextStep = () => {
-    if (currentStep < steps.length - 1) {
+    if (currentStep < steps.length - 1 && stepValidations[currentStep]) {
       setCurrentStep(currentStep + 1);
     }
   };
@@ -47,8 +47,17 @@ export default function MiseEnPlace() {
     }
   };
 
+  const handleValidationSuccess = () => {
+    const newValidations = [...stepValidations];
+    newValidations[currentStep] = true;
+    setStepValidations(newValidations);
+  };
+
   const goToStep = (stepIndex: number) => {
-    setCurrentStep(stepIndex);
+    // Only allow going to steps that are validated or the current step
+    if (stepIndex <= currentStep || (stepIndex > 0 && stepValidations[stepIndex - 1])) {
+      setCurrentStep(stepIndex);
+    }
   };
 
   return (
@@ -140,18 +149,35 @@ export default function MiseEnPlace() {
             </button>
 
             {currentStep === steps.length - 1 ? (
-              <Link
-                href="/"
-                className="bg-green-500 hover:bg-green-600 text-white font-semibold py-3 px-6 rounded-lg transition-colors"
-              >
-                Lesson Complete! 🎉
-              </Link>
+              stepValidations[currentStep] ? (
+                <Link
+                  href="/"
+                  className="bg-green-500 hover:bg-green-600 text-white font-semibold py-3 px-6 rounded-lg transition-colors"
+                >
+                  Lesson Complete! 🎉
+                </Link>
+              ) : (
+                <div className="text-center">
+                  <p className="text-gray-600 text-sm mb-2">Complete the AI validation below to finish</p>
+                  <button
+                    disabled
+                    className="bg-gray-300 text-gray-500 font-semibold py-3 px-6 rounded-lg cursor-not-allowed"
+                  >
+                    Validate Final Step
+                  </button>
+                </div>
+              )
             ) : (
               <button
                 onClick={nextStep}
-                className="bg-purple-500 hover:bg-purple-600 text-white font-semibold py-3 px-6 rounded-lg transition-colors"
+                disabled={!stepValidations[currentStep]}
+                className={`font-semibold py-3 px-6 rounded-lg transition-colors ${
+                  stepValidations[currentStep]
+                    ? 'bg-purple-500 hover:bg-purple-600 text-white'
+                    : 'bg-gray-300 text-gray-500 cursor-not-allowed'
+                }`}
               >
-                Next Step
+                {stepValidations[currentStep] ? 'Next Step' : 'Validate Technique First'}
               </button>
             )}
           </div>

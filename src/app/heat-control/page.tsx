@@ -34,9 +34,10 @@ const steps = [
 
 export default function HeatControl() {
   const [currentStep, setCurrentStep] = useState(0);
+  const [stepValidations, setStepValidations] = useState<boolean[]>(new Array(steps.length).fill(false));
 
   const nextStep = () => {
-    if (currentStep < steps.length - 1) {
+    if (currentStep < steps.length - 1 && stepValidations[currentStep]) {
       setCurrentStep(currentStep + 1);
     }
   };
@@ -47,8 +48,17 @@ export default function HeatControl() {
     }
   };
 
+  const handleValidationSuccess = () => {
+    const newValidations = [...stepValidations];
+    newValidations[currentStep] = true;
+    setStepValidations(newValidations);
+  };
+
   const goToStep = (stepIndex: number) => {
-    setCurrentStep(stepIndex);
+    // Only allow going to steps that are validated or the current step
+    if (stepIndex <= currentStep || (stepIndex > 0 && stepValidations[stepIndex - 1])) {
+      setCurrentStep(stepIndex);
+    }
   };
 
   return (
@@ -72,16 +82,37 @@ export default function HeatControl() {
             <span className="text-sm text-gray-600">
               Step {currentStep + 1} of {steps.length}
             </span>
-            <span className="text-sm text-gray-600">
-              {Math.round(((currentStep + 1) / steps.length) * 100)}% Complete
-            </span>
+            <div className="flex items-center gap-4">
+              <span className="text-sm text-gray-600">
+                {stepValidations.filter(Boolean).length} of {steps.length} validated
+              </span>
+              <span className="text-sm text-gray-600">
+                {Math.round(((currentStep + 1) / steps.length) * 100)}% Complete
+              </span>
+            </div>
           </div>
-          <div className="w-full bg-gray-200 rounded-full h-2">
+          <div className="w-full bg-gray-200 rounded-full h-2 mb-2">
             <div 
               className="bg-red-500 h-2 rounded-full transition-all duration-300"
               style={{ width: `${((currentStep + 1) / steps.length) * 100}%` }}
             />
           </div>
+          <div className="w-full bg-gray-200 rounded-full h-1">
+            <div 
+              className="bg-green-500 h-1 rounded-full transition-all duration-300"
+              style={{ width: `${(stepValidations.filter(Boolean).length / steps.length) * 100}%` }}
+            />
+          </div>
+          {!stepValidations[currentStep] && (
+            <div className="mt-3 p-3 bg-orange-50 border border-orange-200 rounded-lg">
+              <div className="flex items-center">
+                <span className="text-orange-500 mr-2">🎯</span>
+                <p className="text-orange-800 text-sm font-medium">
+                  You must validate your technique with the AI coach below before proceeding to the next step.
+                </p>
+              </div>
+            </div>
+          )}
         </div>
 
         {/* Step Navigation */}
@@ -91,15 +122,20 @@ export default function HeatControl() {
               <button
                 key={index}
                 onClick={() => goToStep(index)}
+                disabled={index > currentStep && !stepValidations[index - 1]}
                 className={`w-8 h-8 rounded-full font-medium text-sm transition-colors ${
                   index === currentStep
                     ? 'bg-red-500 text-white'
+                    : stepValidations[index]
+                    ? 'bg-green-500 text-white'
                     : index < currentStep
                     ? 'bg-green-500 text-white'
+                    : index > currentStep && !stepValidations[index - 1]
+                    ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
                     : 'bg-gray-200 text-gray-600 hover:bg-gray-300'
                 }`}
               >
-                {index + 1}
+                {stepValidations[index] ? '✓' : index + 1}
               </button>
             ))}
           </div>
@@ -140,18 +176,35 @@ export default function HeatControl() {
             </button>
 
             {currentStep === steps.length - 1 ? (
-              <Link
-                href="/"
-                className="bg-green-500 hover:bg-green-600 text-white font-semibold py-3 px-6 rounded-lg transition-colors"
-              >
-                Lesson Complete! 🎉
-              </Link>
+              stepValidations[currentStep] ? (
+                <Link
+                  href="/"
+                  className="bg-green-500 hover:bg-green-600 text-white font-semibold py-3 px-6 rounded-lg transition-colors"
+                >
+                  Lesson Complete! 🎉
+                </Link>
+              ) : (
+                <div className="text-center">
+                  <p className="text-gray-600 text-sm mb-2">Complete the AI validation below to finish</p>
+                  <button
+                    disabled
+                    className="bg-gray-300 text-gray-500 font-semibold py-3 px-6 rounded-lg cursor-not-allowed"
+                  >
+                    Validate Final Step
+                  </button>
+                </div>
+              )
             ) : (
               <button
                 onClick={nextStep}
-                className="bg-red-500 hover:bg-red-600 text-white font-semibold py-3 px-6 rounded-lg transition-colors"
+                disabled={!stepValidations[currentStep]}
+                className={`font-semibold py-3 px-6 rounded-lg transition-colors ${
+                  stepValidations[currentStep]
+                    ? 'bg-red-500 hover:bg-red-600 text-white'
+                    : 'bg-gray-300 text-gray-500 cursor-not-allowed'
+                }`}
               >
-                Next Step
+                {stepValidations[currentStep] ? 'Next Step' : 'Validate Technique First'}
               </button>
             )}
           </div>
@@ -160,6 +213,9 @@ export default function HeatControl() {
           <VisionCoach 
             skill="heat-control"
             context={`Currently learning: ${steps[currentStep].title}. ${steps[currentStep].content}`}
+            stepTitle={steps[currentStep].title}
+            requireValidation={true}
+            onValidationSuccess={handleValidationSuccess}
           />
         </div>
       </div>

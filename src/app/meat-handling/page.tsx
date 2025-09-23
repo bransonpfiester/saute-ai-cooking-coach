@@ -33,10 +33,10 @@ const steps = [
 ];
 
 export default function MeatHandling() {
-  const [currentStep, setCurrentStep] = useState(0);
+  const [currentStep, setCurrentStep] = useState(0);  const [stepValidations, setStepValidations] = useState<boolean[]>(new Array(steps.length).fill(false));
 
   const nextStep = () => {
-    if (currentStep < steps.length - 1) {
+    if (currentStep < steps.length - 1 && stepValidations[currentStep]) {
       setCurrentStep(currentStep + 1);
     }
   };
@@ -47,8 +47,17 @@ export default function MeatHandling() {
     }
   };
 
+  const handleValidationSuccess = () => {
+    const newValidations = [...stepValidations];
+    newValidations[currentStep] = true;
+    setStepValidations(newValidations);
+  };
+
   const goToStep = (stepIndex: number) => {
-    setCurrentStep(stepIndex);
+    // Only allow going to steps that are validated or the current step
+    if (stepIndex <= currentStep || (stepIndex > 0 && stepValidations[stepIndex - 1])) {
+      setCurrentStep(stepIndex);
+    }
   };
 
   return (

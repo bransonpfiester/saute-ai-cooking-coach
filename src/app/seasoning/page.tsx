@@ -34,9 +34,10 @@ const steps = [
 
 export default function Seasoning() {
   const [currentStep, setCurrentStep] = useState(0);
+  const [stepValidations, setStepValidations] = useState<boolean[]>(new Array(steps.length).fill(false));
 
   const nextStep = () => {
-    if (currentStep < steps.length - 1) {
+    if (currentStep < steps.length - 1 && stepValidations[currentStep]) {
       setCurrentStep(currentStep + 1);
     }
   };
@@ -47,8 +48,16 @@ export default function Seasoning() {
     }
   };
 
+  const handleValidationSuccess = () => {
+    const newValidations = [...stepValidations];
+    newValidations[currentStep] = true;
+    setStepValidations(newValidations);
+  };
+
   const goToStep = (stepIndex: number) => {
-    setCurrentStep(stepIndex);
+    if (stepIndex <= currentStep || (stepIndex > 0 && stepValidations[stepIndex - 1])) {
+      setCurrentStep(stepIndex);
+    }
   };
 
   return (
@@ -160,6 +169,9 @@ export default function Seasoning() {
           <VisionCoach 
             skill="seasoning"
             context={`Currently learning: ${steps[currentStep].title}. ${steps[currentStep].content}`}
+            stepTitle={steps[currentStep].title}
+            requireValidation={true}
+            onValidationSuccess={handleValidationSuccess}
           />
         </div>
       </div>
