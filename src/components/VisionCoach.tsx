@@ -40,18 +40,30 @@ export default function VisionCoach({ skill, context = '', stepTitle = '', onVal
   const startCamera = async () => {
     try {
       setError('');
+      
+      // Check if getUserMedia is supported
+      if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+        throw new Error('Camera not supported in this browser');
+      }
+
+      // Request camera permission with optimal settings for mobile
       const stream = await navigator.mediaDevices.getUserMedia({
         video: {
-          width: { ideal: 640 },
-          height: { ideal: 480 },
-          facingMode: 'user'
-        }
+          width: { ideal: 1280, max: 1920 },
+          height: { ideal: 720, max: 1080 },
+          facingMode: 'user', // Front camera for mobile
+          frameRate: { ideal: 30, max: 60 }
+        },
+        audio: false // We don't need audio
       });
 
       if (videoRef.current) {
         videoRef.current.srcObject = stream;
         setIsStreamActive(true);
         setHasPermission(true);
+        
+        // Ensure video plays on mobile
+        videoRef.current.play().catch(console.error);
       }
     } catch (error: unknown) {
       console.error('Camera access error:', error);
@@ -59,15 +71,41 @@ export default function VisionCoach({ skill, context = '', stepTitle = '', onVal
       
       if (error && typeof error === 'object' && 'name' in error) {
         if (error.name === 'NotAllowedError') {
-          setError('Camera access denied. Please allow camera permissions and refresh the page.');
+          setError('Camera access denied. Please allow camera permissions in your browser settings and refresh the page.');
         } else if (error.name === 'NotFoundError') {
           setError('No camera found. Please connect a camera and try again.');
+        } else if (error.name === 'NotReadableError') {
+          setError('Camera is being used by another application. Please close other apps using the camera.');
+        } else if (error.name === 'OverconstrainedError') {
+          setError('Camera constraints not supported. Trying with basic settings...');
+          // Fallback with simpler constraints
+          tryFallbackCamera();
         } else {
-          setError('Failed to access camera. Please check your camera settings.');
+          setError('Failed to access camera. Please check your camera settings and try again.');
         }
       } else {
-        setError('Failed to access camera. Please check your camera settings.');
+        setError('Camera not supported or failed to initialize. Please use a modern browser with camera support.');
       }
+    }
+  };
+
+  // Fallback camera with minimal constraints
+  const tryFallbackCamera = async () => {
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({
+        video: true
+      });
+
+      if (videoRef.current) {
+        videoRef.current.srcObject = stream;
+        setIsStreamActive(true);
+        setHasPermission(true);
+        setError('');
+        videoRef.current.play().catch(console.error);
+      }
+    } catch (fallbackError) {
+      console.error('Fallback camera error:', fallbackError);
+      setError('Camera access failed. Please check your browser permissions.');
     }
   };
 

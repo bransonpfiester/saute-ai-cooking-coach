@@ -4,6 +4,7 @@ import Link from 'next/link';
 import { useState } from 'react';
 import VisionCoach from '@/components/VisionCoach';
 import ConfirmationModal from '@/components/ConfirmationModal';
+import FloatingBackButton from '@/components/FloatingBackButton';
 
 const steps = [
   {
@@ -77,16 +78,11 @@ export default function PanBasics() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-slate-50">
+    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-slate-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900">
+      <FloatingBackButton />
       <div className="container mx-auto px-4 py-8">
         {/* Header */}
         <div className="text-center mb-8">
-          <Link 
-            href="/"
-            className="inline-block text-gray-600 hover:text-gray-700 mb-4 font-medium"
-          >
-            ← Back to Home
-          </Link>
           <h1 className="text-4xl font-bold text-gray-800 mb-2">Pan Basics</h1>
           <p className="text-gray-600">Master pan selection, heating, and cooking techniques</p>
         </div>

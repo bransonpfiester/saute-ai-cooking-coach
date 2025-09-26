@@ -3,6 +3,7 @@
 import Link from 'next/link';
 import { useState } from 'react';
 import VisionCoach from '@/components/VisionCoach';
+import FloatingBackButton from '@/components/FloatingBackButton';
 
 const steps = [
   {
@@ -61,16 +62,11 @@ export default function VegetablePrep() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-emerald-50 to-green-50">
+    <div className="min-h-screen bg-gradient-to-br from-emerald-50 to-green-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900">
+      <FloatingBackButton />
       <div className="container mx-auto px-4 py-8">
         {/* Header */}
         <div className="text-center mb-8">
-          <Link 
-            href="/"
-            className="inline-block text-emerald-600 hover:text-emerald-700 mb-4 font-medium"
-          >
-            ← Back to Home
-          </Link>
           <h1 className="text-4xl font-bold text-gray-800 mb-2">Vegetable Prep</h1>
           <p className="text-gray-600">Master vegetable handling, cutting, and preparation</p>
         </div>

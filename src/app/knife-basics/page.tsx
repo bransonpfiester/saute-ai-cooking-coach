@@ -4,6 +4,7 @@ import Link from 'next/link';
 import { useState } from 'react';
 import VisionCoach from '@/components/VisionCoach';
 import ConfirmationModal from '@/components/ConfirmationModal';
+import FloatingBackButton from '@/components/FloatingBackButton';
 
 const steps = [
   {
@@ -90,19 +91,11 @@ export default function KnifeBasics() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-orange-50 via-white to-red-50 p-4">
+    <div className="min-h-screen bg-gradient-to-br from-orange-50 via-white to-red-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 p-4">
+      <FloatingBackButton />
       <div className="max-w-4xl mx-auto">
         {/* Header */}
         <div className="text-center mb-8 pt-4">
-          <Link 
-            href="/"
-            className="inline-flex items-center text-gray-600 hover:text-gray-800 mb-6 font-medium transition-colors"
-          >
-            <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-            </svg>
-            Back to Skills
-          </Link>
           
           <div className="inline-flex items-center justify-center w-20 h-20 bg-gradient-to-br from-orange-400 to-red-500 rounded-3xl mb-6 shadow-lg">
             <span className="text-3xl">🔪</span>
