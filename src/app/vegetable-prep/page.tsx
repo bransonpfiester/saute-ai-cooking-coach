@@ -169,6 +169,9 @@ export default function VegetablePrep() {
           <VisionCoach 
             skill="vegetable-prep"
             context={`Currently learning: ${steps[currentStep].title}. ${steps[currentStep].content}`}
+            stepTitle={steps[currentStep].title}
+            requireValidation={true}
+            onValidationSuccess={handleValidationSuccess}
           />
         </div>
       </div>

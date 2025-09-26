@@ -212,27 +212,142 @@ export default function VisionCoach({ skill, context = '', stepTitle = '', onVal
         </p>
       </div>
 
-      {/* Camera Permission Check */}
-      {hasPermission === null && (
-        <div className="text-center bg-gradient-to-r from-blue-50 to-indigo-50 border border-blue-200 rounded-3xl p-8">
-          <div className="w-16 h-16 bg-gradient-to-br from-blue-400 to-indigo-500 rounded-3xl flex items-center justify-center mx-auto mb-4">
-            <span className="text-white text-2xl">📹</span>
-          </div>
-          <h3 className="text-xl font-bold text-gray-900 mb-2">Ready to Start AI Coaching?</h3>
-          <p className="text-gray-600 mb-6">Enable your camera to get personalized feedback on your technique</p>
-          <button
-            onClick={startCamera}
-            className="inline-flex items-center px-8 py-3 bg-gradient-to-r from-blue-500 to-indigo-600 text-white font-semibold rounded-2xl shadow-lg hover:shadow-xl hover:scale-105 transition-all duration-300"
-          >
-            <span className="mr-2">🎥</span>
-            Enable Camera & Start Coaching
-          </button>
+      {/* Mobile-First Camera Preview */}
+      <div className="bg-white rounded-3xl shadow-xl border border-gray-100 overflow-hidden">
+        {/* Camera View - Full Width on Mobile */}
+        <div className="relative bg-gradient-to-br from-gray-900 to-gray-800 aspect-video sm:aspect-[4/3] overflow-hidden">
+          <video
+            ref={videoRef}
+            autoPlay
+            playsInline
+            muted
+            className="w-full h-full object-cover"
+          />
+          <canvas ref={canvasRef} className="hidden" />
+          
+          {/* Mobile-optimized Live indicator */}
+          {isStreamActive && (
+            <div className="absolute top-3 left-3 flex items-center gap-2 bg-red-500 text-white px-3 py-1.5 rounded-full text-xs font-bold shadow-lg">
+              <div className="w-2 h-2 bg-white rounded-full animate-pulse"></div>
+              LIVE
+            </div>
+          )}
+          
+          {/* Mobile-optimized AI Status */}
+          {isStreamActive && (
+            <div className="absolute top-3 right-3 flex items-center gap-1 bg-green-500 text-white px-2 py-1.5 rounded-full text-xs font-medium shadow-lg">
+              <div className="w-1.5 h-1.5 bg-white rounded-full animate-ping"></div>
+              AI
+            </div>
+          )}
+          
+          {/* Mobile-friendly overlay guidelines */}
+          {isStreamActive && (
+            <div className="absolute inset-4 border-2 border-cyan-400 border-dashed rounded-2xl opacity-50 pointer-events-none">
+              <div className="absolute -top-0.5 left-2 text-cyan-400 text-xs font-bold bg-gray-900 bg-opacity-80 px-2 py-0.5 rounded">
+                Keep in frame
+              </div>
+            </div>
+          )}
+          
+          {/* Camera not active - Mobile optimized */}
+          {!isStreamActive && (
+            <div className="absolute inset-0 flex items-center justify-center bg-gradient-to-br from-gray-800 to-gray-900">
+              <div className="text-center px-4">
+                <div className="w-16 h-16 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-xl">
+                  <span className="text-white text-2xl">📹</span>
+                </div>
+                <h4 className="text-white font-bold text-lg mb-2">AI Coach Camera</h4>
+                <p className="text-gray-300 text-sm mb-4 max-w-xs">
+                  Your camera preview will appear here
+                </p>
+                {hasPermission === null && (
+                  <button
+                    onClick={startCamera}
+                    className="inline-flex items-center px-6 py-3 bg-gradient-to-r from-blue-500 to-indigo-600 text-white font-semibold rounded-xl shadow-lg active:scale-95 transition-all duration-200"
+                  >
+                    <span className="mr-2">🎥</span>
+                    Enable Camera
+                  </button>
+                )}
+              </div>
+            </div>
+          )}
         </div>
-      )}
+
+        {/* Instructions Section - Below Camera */}
+        <div className="p-6">
+          {/* Header */}
+          <div className="flex items-center gap-3 mb-4">
+            <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-xl flex items-center justify-center">
+              <span className="text-white text-lg">👁️</span>
+            </div>
+            <div>
+              <h3 className="text-lg font-bold text-gray-800">
+                AI Technique Coach
+              </h3>
+              <p className="text-blue-600 text-sm">
+                {isStreamActive ? 'Watching your technique' : 'Ready to help you improve'}
+              </p>
+            </div>
+          </div>
+
+          {/* Mobile-friendly status */}
+          {isStreamActive && (
+            <div className="mb-4 bg-gradient-to-r from-green-50 to-blue-50 rounded-xl p-3 border border-green-200">
+              <div className="flex items-center justify-between text-sm">
+                <div className="flex items-center gap-2">
+                  <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
+                  <span className="text-green-800 font-medium">Camera Active</span>
+                </div>
+                <span className="text-blue-700">
+                  {isAnalyzing ? 'Analyzing...' : 'Ready to analyze'}
+                </span>
+              </div>
+            </div>
+          )}
+
+          {/* Instructions */}
+          <div className="space-y-3">
+            <h4 className="font-semibold text-gray-800 text-base">📋 What to do:</h4>
+            <div className="space-y-2 text-sm text-gray-600">
+              <div className="flex items-start gap-2">
+                <span className="text-blue-500 font-bold">1.</span>
+                <span>Position your phone so the camera can see your hands and workspace</span>
+              </div>
+              <div className="flex items-start gap-2">
+                <span className="text-blue-500 font-bold">2.</span>
+                <span>Practice the technique shown in the lesson above</span>
+              </div>
+              <div className="flex items-start gap-2">
+                <span className="text-blue-500 font-bold">3.</span>
+                <span>Tap &quot;Get AI Feedback&quot; when you&apos;re ready for analysis</span>
+              </div>
+              <div className="flex items-start gap-2">
+                <span className="text-blue-500 font-bold">4.</span>
+                <span>Follow the AI&apos;s suggestions to improve your technique</span>
+              </div>
+            </div>
+          </div>
+
+          {/* Mobile tips */}
+          <div className="mt-4 bg-amber-50 rounded-xl p-3 border border-amber-200">
+            <div className="flex items-start gap-2">
+              <span className="text-amber-600 text-lg">💡</span>
+              <div>
+                <p className="text-amber-800 font-medium text-sm">Mobile Tips:</p>
+                <p className="text-amber-700 text-xs mt-1">
+                  • Use good lighting • Keep phone steady • Show your full technique
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
 
       {/* Camera Access Denied */}
       {hasPermission === false && (
-        <div className="bg-red-50 border border-red-200 rounded-lg p-4">
+        <div className="mt-4 bg-red-50 border border-red-200 rounded-lg p-4">
           <div className="flex items-center">
             <div className="text-red-500 mr-3">⚠️</div>
             <div>
@@ -243,86 +358,60 @@ export default function VisionCoach({ skill, context = '', stepTitle = '', onVal
         </div>
       )}
 
-      {/* Video Stream */}
+      {/* Mobile-Optimized Controls */}
       {hasPermission && (
-        <div className="space-y-6">
-          <div className="relative bg-gradient-to-br from-gray-100 to-gray-200 rounded-3xl overflow-hidden shadow-inner">
-            <video
-              ref={videoRef}
-              autoPlay
-              playsInline
-              muted
-              className="w-full h-auto rounded-3xl"
-              style={{ maxHeight: '400px' }}
-            />
-            <canvas ref={canvasRef} className="hidden" />
-            
-            {!isStreamActive && (
-              <div className="absolute inset-0 flex items-center justify-center bg-gradient-to-br from-gray-100 to-gray-200 rounded-3xl">
-                <div className="text-center">
-                  <div className="w-16 h-16 bg-gradient-to-br from-gray-300 to-gray-400 rounded-3xl flex items-center justify-center mx-auto mb-4">
-                    <span className="text-white text-2xl">📹</span>
-                  </div>
-                  <p className="text-gray-600 font-medium">Camera not active</p>
-                </div>
-              </div>
-            )}
-          </div>
-
-          {/* Controls */}
-          <div className="flex gap-3 justify-center">
-            {!isStreamActive ? (
+        <div className="mt-6">
+          {!isStreamActive ? (
+            <button
+              onClick={startCamera}
+              className="w-full bg-green-500 active:bg-green-600 text-white font-semibold py-4 px-6 rounded-2xl transition-colors shadow-lg active:scale-95 duration-200"
+            >
+              🎥 Start Camera
+            </button>
+          ) : (
+            <div className="space-y-3">
               <button
-                onClick={startCamera}
-                className="bg-green-500 hover:bg-green-600 text-white font-semibold py-2 px-4 rounded-lg transition-colors"
+                onClick={captureAndAnalyze}
+                disabled={isAnalyzing || (requireValidation && isApproved === true)}
+                className={`w-full font-semibold py-4 px-6 rounded-2xl transition-all duration-200 flex items-center justify-center gap-3 shadow-lg active:scale-95 ${
+                  requireValidation && isApproved === true
+                    ? 'bg-green-500 text-white cursor-default'
+                    : requireValidation
+                    ? 'bg-orange-500 active:bg-orange-600 disabled:bg-gray-400 text-white'
+                    : 'bg-blue-500 active:bg-blue-600 disabled:bg-gray-400 text-white'
+                }`}
               >
-                Start Camera
+                {isAnalyzing ? (
+                  <>
+                    <div className="animate-spin w-5 h-5 border-2 border-white border-t-transparent rounded-full"></div>
+                    <span>Analyzing Technique...</span>
+                  </>
+                ) : requireValidation && isApproved === true ? (
+                  <>
+                    <span className="text-xl">✅</span>
+                    <span>Technique Approved!</span>
+                  </>
+                ) : requireValidation ? (
+                  <>
+                    <span className="text-xl">🎯</span>
+                    <span>{attempts === 0 ? 'Validate My Technique' : 'Try Again'}</span>
+                  </>
+                ) : (
+                  <>
+                    <span className="text-xl">📸</span>
+                    <span>Get AI Feedback</span>
+                  </>
+                )}
               </button>
-            ) : (
-              <>
-                <button
-                  onClick={captureAndAnalyze}
-                  disabled={isAnalyzing || (requireValidation && isApproved === true)}
-                  className={`font-semibold py-2 px-6 rounded-lg transition-colors flex items-center gap-2 ${
-                    requireValidation && isApproved === true
-                      ? 'bg-green-500 text-white cursor-default'
-                      : requireValidation
-                      ? 'bg-orange-500 hover:bg-orange-600 disabled:bg-gray-400 text-white'
-                      : 'bg-blue-500 hover:bg-blue-600 disabled:bg-gray-400 text-white'
-                  }`}
-                >
-                  {isAnalyzing ? (
-                    <>
-                      <div className="animate-spin w-4 h-4 border-2 border-white border-t-transparent rounded-full"></div>
-                      Analyzing Technique...
-                    </>
-                  ) : requireValidation && isApproved === true ? (
-                    <>
-                      <span>✅</span>
-                      Technique Approved!
-                    </>
-                  ) : requireValidation ? (
-                    <>
-                      <span>🎯</span>
-                      {attempts === 0 ? 'Validate My Technique' : 'Try Again'}
-                    </>
-                  ) : (
-                    <>
-                      <span>📸</span>
-                      Get AI Feedback
-                    </>
-                  )}
-                </button>
-                
-                <button
-                  onClick={stopCamera}
-                  className="bg-red-500 hover:bg-red-600 text-white font-semibold py-2 px-4 rounded-lg transition-colors"
-                >
-                  Stop Camera
-                </button>
-              </>
-            )}
-          </div>
+              
+              <button
+                onClick={stopCamera}
+                className="w-full bg-gray-500 active:bg-gray-600 text-white font-medium py-3 px-4 rounded-xl transition-colors active:scale-95 duration-200"
+              >
+                Stop Camera
+              </button>
+            </div>
+          )}
         </div>
       )}
 

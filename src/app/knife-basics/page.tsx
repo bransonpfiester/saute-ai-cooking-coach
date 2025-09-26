@@ -3,41 +3,70 @@
 import Link from 'next/link';
 import { useState } from 'react';
 import VisionCoach from '@/components/VisionCoach';
+import ConfirmationModal from '@/components/ConfirmationModal';
 
 const steps = [
   {
     title: "Choose the Right Knife",
     content: "Start with a sharp chef's knife, 8-10 inches long. A dull knife is more dangerous than a sharp one because it requires more pressure and can slip.",
-    tip: "Test sharpness by gently slicing a piece of paper - it should cut cleanly without tearing."
+    tip: "Test sharpness by gently slicing a piece of paper - it should cut cleanly without tearing.",
+    needsAI: false
   },
   {
     title: "Proper Grip",
     content: "Hold the knife with your dominant hand, gripping the handle firmly. Your thumb and index finger should pinch the blade just above the handle for better control.",
-    tip: "This 'pinch grip' gives you maximum control and precision while cutting."
+    tip: "This 'pinch grip' gives you maximum control and precision while cutting.",
+    needsAI: true
   },
   {
     title: "The Claw Technique",
     content: "Use your non-dominant hand to hold the food. Curl your fingertips under, creating a 'claw' shape. Your knuckles should guide the knife blade.",
-    tip: "Keep your fingertips tucked under at all times - your knuckles act as a natural guard."
+    tip: "Keep your fingertips tucked under at all times - your knuckles act as a natural guard.",
+    needsAI: true
   },
   {
     title: "Basic Cutting Motion",
     content: "Use a rocking motion: keep the tip of the knife on the cutting board and rock the blade down and forward. The knife should never leave the board completely.",
-    tip: "Let the knife do the work - don't force it. Smooth, controlled motions are key."
+    tip: "Let the knife do the work - don't force it. Smooth, controlled motions are key.",
+    needsAI: true
   },
   {
     title: "Practice with an Onion",
     content: "Cut the onion in half from root to tip. Make horizontal cuts (parallel to the board), then vertical cuts, keeping the root intact. Finally, slice perpendicular to create diced pieces.",
-    tip: "Keep the root end intact until the final cuts - it holds the onion together."
+    tip: "Keep the root end intact until the final cuts - it holds the onion together.",
+    needsAI: true
   }
 ];
 
 export default function KnifeBasics() {
   const [currentStep, setCurrentStep] = useState(0);
   const [stepValidations, setStepValidations] = useState<boolean[]>(new Array(steps.length).fill(false));
+  const [showConfirmationModal, setShowConfirmationModal] = useState(false);
 
   const nextStep = () => {
-    if (currentStep < steps.length - 1 && stepValidations[currentStep]) {
+    if (currentStep < steps.length - 1) {
+      const currentStepData = steps[currentStep];
+      
+      // If step doesn't need AI validation, proceed directly
+      if (!currentStepData.needsAI) {
+        setCurrentStep(currentStep + 1);
+        return;
+      }
+      
+      // If step needs AI validation
+      if (stepValidations[currentStep]) {
+        // Step is validated, proceed normally
+        setCurrentStep(currentStep + 1);
+      } else {
+        // Step is not validated, show confirmation modal
+        setShowConfirmationModal(true);
+      }
+    }
+  };
+
+  const handleConfirmNextStep = () => {
+    setShowConfirmationModal(false);
+    if (currentStep < steps.length - 1) {
       setCurrentStep(currentStep + 1);
     }
   };
@@ -131,15 +160,29 @@ export default function KnifeBasics() {
             </div>
           </div>
 
-          {!stepValidations[currentStep] && (
+          {steps[currentStep].needsAI && !stepValidations[currentStep] && (
             <div className="mt-6 p-4 bg-gradient-to-r from-amber-50 to-orange-50 rounded-2xl border border-amber-200">
               <div className="flex items-center">
                 <div className="w-10 h-10 bg-gradient-to-br from-amber-400 to-orange-500 rounded-2xl flex items-center justify-center mr-3">
                   <span className="text-white text-lg">🎯</span>
                 </div>
                 <div>
-                  <p className="text-amber-800 font-medium">Validation Required</p>
+                  <p className="text-amber-800 font-medium">AI Validation Required</p>
                   <p className="text-amber-700 text-sm">Demonstrate your technique with the AI coach to continue</p>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {!steps[currentStep].needsAI && (
+            <div className="mt-6 p-4 bg-gradient-to-r from-green-50 to-emerald-50 rounded-2xl border border-green-200">
+              <div className="flex items-center">
+                <div className="w-10 h-10 bg-gradient-to-br from-green-400 to-emerald-500 rounded-2xl flex items-center justify-center mr-3">
+                  <span className="text-white text-lg">📚</span>
+                </div>
+                <div>
+                  <p className="text-green-800 font-medium">Knowledge Step</p>
+                  <p className="text-green-700 text-sm">This is a theoretical step - read and understand, then continue</p>
                 </div>
               </div>
             </div>
@@ -249,14 +292,13 @@ export default function KnifeBasics() {
             ) : (
               <button
                 onClick={nextStep}
-                disabled={!stepValidations[currentStep]}
                 className={`flex items-center px-6 py-3 rounded-2xl font-medium transition-all duration-300 ${
                   stepValidations[currentStep]
                     ? 'bg-gradient-to-r from-orange-400 to-red-500 text-white shadow-lg hover:shadow-xl hover:scale-105'
-                    : 'bg-gray-200 text-gray-500 cursor-not-allowed'
+                    : 'bg-gradient-to-r from-amber-400 to-orange-500 text-white shadow-lg hover:shadow-xl hover:scale-105'
                 }`}
               >
-                {stepValidations[currentStep] ? 'Next Step' : 'Validate First'}
+                {stepValidations[currentStep] ? 'Next Step' : 'Next Step'}
                 <svg className="w-5 h-5 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
                 </svg>
@@ -265,13 +307,59 @@ export default function KnifeBasics() {
           </div>
         </div>
 
-        {/* AI Vision Coach */}
-        <VisionCoach 
-          skill="knife-basics"
-          context={`Currently learning: ${steps[currentStep].title}. ${steps[currentStep].content}`}
-          stepTitle={steps[currentStep].title}
-          requireValidation={true}
-          onValidationSuccess={handleValidationSuccess}
+        {/* AI Vision Coach - Only show for steps that need AI validation */}
+        {steps[currentStep].needsAI && (
+          <VisionCoach 
+            skill="knife-basics"
+            context={`Currently learning: ${steps[currentStep].title}. ${steps[currentStep].content}`}
+            stepTitle={steps[currentStep].title}
+            requireValidation={true}
+            onValidationSuccess={handleValidationSuccess}
+          />
+        )}
+
+        {/* Information for non-AI steps */}
+        {!steps[currentStep].needsAI && (
+          <div className="bg-white rounded-3xl shadow-lg border border-gray-100 p-8 space-y-6">
+            <div className="text-center">
+              <div className="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-br from-green-400 to-emerald-500 rounded-3xl mb-4 shadow-lg">
+                <span className="text-2xl">📚</span>
+              </div>
+              <h2 className="text-2xl font-bold bg-gradient-to-r from-gray-900 via-gray-700 to-gray-900 bg-clip-text text-transparent mb-2">
+                Knowledge & Theory
+              </h2>
+              <p className="text-gray-600">
+                This step focuses on understanding concepts and making informed choices
+              </p>
+            </div>
+            
+            <div className="bg-gradient-to-r from-green-50 to-emerald-50 rounded-2xl p-6 border border-green-100">
+              <div className="flex items-start">
+                <div className="w-10 h-10 bg-gradient-to-br from-green-400 to-emerald-500 rounded-2xl flex items-center justify-center mr-4">
+                  <span className="text-white text-lg">💡</span>
+                </div>
+                <div>
+                  <p className="text-green-800 font-medium mb-1">Learning Focus</p>
+                  <p className="text-green-700">
+                    This step is about understanding principles and making good choices. 
+                    No physical demonstration is needed - focus on learning the concepts!
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Confirmation Modal */}
+        <ConfirmationModal
+          isOpen={showConfirmationModal}
+          onClose={() => setShowConfirmationModal(false)}
+          onConfirm={handleConfirmNextStep}
+          title="Skip AI Validation?"
+          message={`You haven't validated your technique for "${steps[currentStep].title}" yet. The AI coach can provide valuable feedback to help you improve. Are you sure you want to skip to the next step?`}
+          confirmText="Skip Anyway"
+          cancelText="Go Back"
+          type="warning"
         />
       </div>
     </div>

@@ -169,6 +169,9 @@ export default function SauceBasics() {
           <VisionCoach 
             skill="sauce-basics"
             context={`Currently learning: ${steps[currentStep].title}. ${steps[currentStep].content}`}
+            stepTitle={steps[currentStep].title}
+            requireValidation={true}
+            onValidationSuccess={handleValidationSuccess}
           />
         </div>
       </div>

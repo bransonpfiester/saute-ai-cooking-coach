@@ -3,6 +3,7 @@
 import Link from 'next/link';
 import { useState } from 'react';
 import VisionCoach from '@/components/VisionCoach';
+import ConfirmationModal from '@/components/ConfirmationModal';
 
 const steps = [
   {
@@ -35,9 +36,23 @@ const steps = [
 export default function Seasoning() {
   const [currentStep, setCurrentStep] = useState(0);
   const [stepValidations, setStepValidations] = useState<boolean[]>(new Array(steps.length).fill(false));
+  const [showConfirmationModal, setShowConfirmationModal] = useState(false);
 
   const nextStep = () => {
-    if (currentStep < steps.length - 1 && stepValidations[currentStep]) {
+    if (currentStep < steps.length - 1) {
+      if (stepValidations[currentStep]) {
+        // Step is validated, proceed normally
+        setCurrentStep(currentStep + 1);
+      } else {
+        // Step is not validated, show confirmation modal
+        setShowConfirmationModal(true);
+      }
+    }
+  };
+
+  const handleConfirmNextStep = () => {
+    setShowConfirmationModal(false);
+    if (currentStep < steps.length - 1) {
       setCurrentStep(currentStep + 1);
     }
   };
@@ -172,6 +187,18 @@ export default function Seasoning() {
             stepTitle={steps[currentStep].title}
             requireValidation={true}
             onValidationSuccess={handleValidationSuccess}
+          />
+
+          {/* Confirmation Modal */}
+          <ConfirmationModal
+            isOpen={showConfirmationModal}
+            onClose={() => setShowConfirmationModal(false)}
+            onConfirm={handleConfirmNextStep}
+            title="Skip AI Validation?"
+            message={`You haven't validated your technique for "${steps[currentStep].title}" yet. The AI coach can provide valuable feedback to help you improve. Are you sure you want to skip to the next step?`}
+            confirmText="Skip Anyway"
+            cancelText="Go Back"
+            type="warning"
           />
         </div>
       </div>

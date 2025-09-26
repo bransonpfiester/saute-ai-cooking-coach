@@ -3,40 +3,70 @@
 import Link from 'next/link';
 import { useState } from 'react';
 import VisionCoach from '@/components/VisionCoach';
+import ConfirmationModal from '@/components/ConfirmationModal';
 
 const steps = [
   {
     title: "What is Mise en Place?",
     content: "French for 'everything in its place,' mise en place is the practice of preparing and organizing all ingredients and tools before you start cooking. This is the foundation of professional cooking.",
-    tip: "Professional chefs never start cooking without complete mise en place - it prevents mistakes and reduces stress."
+    tip: "Professional chefs never start cooking without complete mise en place - it prevents mistakes and reduces stress.",
+    needsAI: false
   },
   {
     title: "Read the Entire Recipe First",
     content: "Before touching any ingredient, read through the entire recipe. Note cooking times, temperatures, and special techniques. Look for steps that can be done simultaneously.",
-    tip: "Make notes about timing - which steps can be done while something else is cooking?"
+    tip: "Make notes about timing - which steps can be done while something else is cooking?",
+    needsAI: false
   },
   {
     title: "Prep All Ingredients",
     content: "Wash, chop, measure, and portion all ingredients before turning on any heat. Use small bowls to organize everything. Group ingredients by when they'll be used in the recipe.",
-    tip: "Use the 'bowl method' - small bowls for each ingredient or ingredient group, arranged in the order you'll use them."
+    tip: "Use the 'bowl method' - small bowls for each ingredient or ingredient group, arranged in the order you'll use them.",
+    needsAI: true
   },
   {
     title: "Organize Your Workspace",
     content: "Clean your workspace and arrange tools logically. Keep a 'garbage bowl' for scraps, have clean towels ready, and ensure your knives are sharp and cutting boards are stable.",
-    tip: "Place a damp towel under your cutting board to prevent sliding, and keep a side towel for wiping hands and tools."
+    tip: "Place a damp towel under your cutting board to prevent sliding, and keep a side towel for wiping hands and tools.",
+    needsAI: true
   },
   {
     title: "Clean as You Go",
     content: "Wash dishes and clean spills immediately. Put away ingredients after using them. This prevents cross-contamination and keeps your workspace organized throughout cooking.",
-    tip: "Fill your sink with hot soapy water before you start - you can quickly rinse utensils and bowls as you use them."
+    tip: "Fill your sink with hot soapy water before you start - you can quickly rinse utensils and bowls as you use them.",
+    needsAI: true
   }
 ];
 
 export default function MiseEnPlace() {
-  const [currentStep, setCurrentStep] = useState(0);  const [stepValidations, setStepValidations] = useState<boolean[]>(new Array(steps.length).fill(false));
+  const [currentStep, setCurrentStep] = useState(0);
+  const [stepValidations, setStepValidations] = useState<boolean[]>(new Array(steps.length).fill(false));
+  const [showConfirmationModal, setShowConfirmationModal] = useState(false);
 
   const nextStep = () => {
-    if (currentStep < steps.length - 1 && stepValidations[currentStep]) {
+    if (currentStep < steps.length - 1) {
+      const currentStepData = steps[currentStep];
+      
+      // If step doesn't need AI validation, proceed directly
+      if (!currentStepData.needsAI) {
+        setCurrentStep(currentStep + 1);
+        return;
+      }
+      
+      // If step needs AI validation
+      if (stepValidations[currentStep]) {
+        // Step is validated, proceed normally
+        setCurrentStep(currentStep + 1);
+      } else {
+        // Step is not validated, show confirmation modal
+        setShowConfirmationModal(true);
+      }
+    }
+  };
+
+  const handleConfirmNextStep = () => {
+    setShowConfirmationModal(false);
+    if (currentStep < steps.length - 1) {
       setCurrentStep(currentStep + 1);
     }
   };
@@ -170,14 +200,13 @@ export default function MiseEnPlace() {
             ) : (
               <button
                 onClick={nextStep}
-                disabled={!stepValidations[currentStep]}
                 className={`font-semibold py-3 px-6 rounded-lg transition-colors ${
                   stepValidations[currentStep]
                     ? 'bg-purple-500 hover:bg-purple-600 text-white'
-                    : 'bg-gray-300 text-gray-500 cursor-not-allowed'
+                    : 'bg-gradient-to-r from-amber-400 to-orange-500 text-white hover:from-amber-500 hover:to-orange-600'
                 }`}
               >
-                {stepValidations[currentStep] ? 'Next Step' : 'Validate Technique First'}
+                Next Step
               </button>
             )}
           </div>
@@ -186,6 +215,21 @@ export default function MiseEnPlace() {
           <VisionCoach 
             skill="mise-en-place"
             context={`Currently learning: ${steps[currentStep].title}. ${steps[currentStep].content}`}
+            stepTitle={steps[currentStep].title}
+            requireValidation={true}
+            onValidationSuccess={handleValidationSuccess}
+          />
+
+          {/* Confirmation Modal */}
+          <ConfirmationModal
+            isOpen={showConfirmationModal}
+            onClose={() => setShowConfirmationModal(false)}
+            onConfirm={handleConfirmNextStep}
+            title="Skip AI Validation?"
+            message={`You haven't validated your technique for "${steps[currentStep].title}" yet. The AI coach can provide valuable feedback to help you improve. Are you sure you want to skip to the next step?`}
+            confirmText="Skip Anyway"
+            cancelText="Go Back"
+            type="warning"
           />
         </div>
       </div>
